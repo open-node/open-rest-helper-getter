@@ -70,17 +70,7 @@ describe("open-rest-helper-getter", function() {
         Model.model = {modelInclude: modelInclude};
         getter(Model, 'book', []);
       }, function(err) {
-        return err instanceof Error && err.message === 'req.params[id] or req.hooks[obj][id], id is key\'s name'
-      });
-      done();
-    });
-
-    it("The 4th argument must be string", function(done) {
-      assert.throws(function() {
-        Model.model = {modelInclude: modelInclude};
-        getter(Model, 'book', 'bookId', []);
-      }, function(err) {
-        return err instanceof Error && err.message === 'req.params[id] or req.hooks[obj][id] obj is hook\'s name'
+        return err instanceof Error && err.message === 'Gets the value at path of object.'
       });
       done();
     });
@@ -109,7 +99,7 @@ describe("open-rest-helper-getter", function() {
     });
 
     it("All arguments right no exception id = req.hooks[obj][id]", function(done) {
-      var helper = getter(Model, 'book', 'bookId', 'user');
+      var helper = getter(Model, 'book', 'hooks.user.bookId');
       var req = {
         hooks: {
           user: {bookId: 30}

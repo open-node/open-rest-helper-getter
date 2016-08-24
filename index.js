@@ -1,14 +1,10 @@
 var delegate  = require('func-delegate')
+  , _         = require('lodash')
   , Sequelize = require('sequelize');
 
-var getId = function(req, _id, _obj) {
-  var obj = _obj ? req.hooks[_obj] : req.params;
-  return obj[_id];
-};
-
-var getter = function(Model, hook, _id, _obj) {
+var getter = function(Model, hook, keyPath) {
   return function(req, res, next) {
-    var id  = getId(req, _id, _obj);
+    var id  = _.get(req, keyPath);
     var include = Model.model.modelInclude(req.params, Model.includes);
     var opt = {where: {id: id}};
     if (include) opt.include = include;
@@ -37,14 +33,9 @@ module.exports = delegate(getter, [{
   allowNull: false,
   message: 'Geted instance will hook on req.hooks[hook], so `hook` must be a string'
 }, {
-  name: 'id',
+  name: 'keyPath',
   type: String,
   allowNull: false,
-  defaultValue: 'id',
-  message: 'req.params[id] or req.hooks[obj][id], id is key\'s name'
-}, {
-  name: 'obj',
-  type: String,
-  allowNull: true,
-  message: 'req.params[id] or req.hooks[obj][id] obj is hook\'s name'
+  defaultValue: 'params.id',
+  message: 'Gets the value at path of object.'
 }]);

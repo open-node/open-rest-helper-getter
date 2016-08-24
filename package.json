@@ -1,6 +1,6 @@
 {
   "name": "open-rest-helper-getter",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Controller helper getter for open-rest or restify, Used to get instance from Model",
   "main": "index.js",
   "scripts": {
@@ -26,9 +26,9 @@
   "homepage": "https://github.com/open-node/open-rest-helper-getter#readme",
   "dependencies": {
     "func-delegate": "^0.2.2",
+    "lodash": "^4.15.0",
     "mysql": "^2.11.1",
-    "sequelize": "^3.24.0",
-    "underscore": "^1.8.3"
+    "sequelize": "^3.24.0"
   },
   "devDependencies": {
     "codecov": "^1.0.1",
