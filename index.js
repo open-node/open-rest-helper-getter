@@ -2,10 +2,20 @@ var delegate  = require('func-delegate')
   , _         = require('lodash')
   , Sequelize = require('sequelize');
 
+var modelInclude = function(params, includes) {
+  if (!includes) return;
+  if (!_.isString(params.includes)) return;
+  var ret = _.filter(params.includes.split(','), function(x) {
+    return includes[x];
+  });
+  if (ret.length === 0) return;
+  return _.map(ret, function(x) { return _.clone(includes[x]); });
+};
+
 var getter = function(Model, hook, keyPath) {
   return function(req, res, next) {
     var id  = _.get(req, keyPath);
-    var include = Model.model.modelInclude(req.params, Model.includes);
+    var include = modelInclude(req.params, Model.includes);
     var opt = {where: {id: id}};
     if (include) opt.include = include;
     Model.find(opt).then(function(model) {
@@ -18,14 +28,6 @@ var getter = function(Model, hook, keyPath) {
 module.exports = delegate(getter, [{
   name: 'Model',
   type: Sequelize.Model,
-  validate: {
-    model: function(value) {
-      if (!value.model || !value.model.modelInclude) {
-        throw Error('Please use open-rest version>=7.0.0');
-      }
-      return true;
-    }
-  },
   message: 'Model must be a class of Sequelize defined'
 }, {
   name: 'hook',
