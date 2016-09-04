@@ -1,6 +1,6 @@
 {
   "name": "open-rest-helper-getter",
-  "version": "0.4.0",
+  "version": "0.5.0",
   "description": "Controller helper getter for open-rest or restify, Used to get instance from Model",
   "main": "index.js",
   "scripts": {
@@ -32,7 +32,6 @@
     "codecov": "^1.0.1",
     "istanbul": "^0.4.4",
     "mocha": "^3.0.2",
-    "mysql": "^2.11.1",
-    "sequelize": "^3.24.0"
+    "open-rest": "^6.5.6"
   }
 }

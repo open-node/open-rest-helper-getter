@@ -1,6 +1,5 @@
 var delegate  = require('func-delegate')
-  , _         = require('lodash')
-  , Sequelize = require('sequelize');
+  , _         = require('lodash');
 
 var modelInclude = function(params, includes) {
   if (!includes) return;
@@ -25,19 +24,22 @@ var getter = function(Model, hook, keyPath) {
   };
 };
 
-module.exports = delegate(getter, [{
-  name: 'Model',
-  type: Sequelize.Model,
-  message: 'Model must be a class of Sequelize defined'
-}, {
-  name: 'hook',
-  type: String,
-  allowNull: false,
-  message: 'Geted instance will hook on req.hooks[hook], so `hook` must be a string'
-}, {
-  name: 'keyPath',
-  type: String,
-  allowNull: false,
-  defaultValue: 'params.id',
-  message: 'Gets the value at path of object.'
-}]);
+module.exports = function(rest) {
+  var Sequelize = rest.Sequelize;
+  return rest.helper.getter = delegate(getter, [{
+    name: 'Model',
+    type: Sequelize.Model,
+    message: 'Model must be a class of Sequelize defined'
+  }, {
+    name: 'hook',
+    type: String,
+    allowNull: false,
+    message: 'Geted instance will hook on req.hooks[hook], so `hook` must be a string'
+  }, {
+    name: 'keyPath',
+    type: String,
+    allowNull: false,
+    defaultValue: 'params.id',
+    message: 'Gets the value at path of object.'
+  }]);
+};

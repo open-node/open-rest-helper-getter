@@ -12,7 +12,10 @@ npm instsall open-rest-helper-getter --save
 ```
 
 ```js
-var getter = require('open-rest-helper-getter');
+var rest = require('open-rest');
+var getter = require('open-rest-helper-getter')(rest);
+
+// rest.helper.getter Equivalent to getter
 
 // Model Sequlize Model的定义
 // hook 获取到的实例存放地址

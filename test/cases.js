@@ -1,6 +1,7 @@
 var assert      = require('assert')
-  , Sequelize   = require('sequelize')
-  , getter      = require('../');
+  , rest        = require('open-rest')
+  , Sequelize   = rest.Sequelize
+  , getter      = require('../')(rest);
 
 var sequelize = new Sequelize();
 var Model = sequelize.define('book', {
