@@ -6,4 +6,5 @@ thumb
 *.log
 *~
 coverage
+.nyc_output
 coverage/*

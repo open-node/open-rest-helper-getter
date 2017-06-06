@@ -5,6 +5,10 @@ open-rest 控制器 helper 插件，用来从 Model 从获取某个 Model 的实
 [![Build status](https://api.travis-ci.org/open-node/open-rest-helper-getter.svg?branch=master)](https://travis-ci.org/open-node/open-rest-helper-getter)
 [![codecov](https://codecov.io/gh/open-node/open-rest-helper-getter/branch/master/graph/badge.svg)](https://codecov.io/gh/open-node/open-rest-helper-getter)
 
+# Node version
+<pre> >= 6 </pre>
+
+
 # Usage
 
 ```bash
@@ -12,8 +16,8 @@ npm instsall open-rest-helper-getter --save
 ```
 
 ```js
-var rest = require('open-rest');
-var getter = require('open-rest-helper-getter')(rest);
+const rest = require('open-rest');
+const getter = require('open-rest-helper-getter')(rest);
 
 // rest.helper.getter Equivalent to getter
 

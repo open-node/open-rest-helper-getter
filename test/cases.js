@@ -1,246 +1,251 @@
-var assert      = require('assert')
-  , rest        = require('open-rest')
-  , Sequelize   = rest.Sequelize
-  , getter      = require('../')(rest);
+const assert = require('assert');
+const rest = require('open-rest');
+const om = require('open-rest-with-mysql');
+const getterHelper = require('../');
 
-var sequelize = new Sequelize();
-var Model = sequelize.define('book', {
+om(rest);
+const getter = getterHelper(rest);
+const Sequelize = rest.Sequelize;
+const sequelize = new Sequelize();
+const Model = sequelize.define('book', {
   id: {
     type: Sequelize.INTEGER.UNSIGNED,
     primaryKey: true,
-    autoIncrement: true
+    autoIncrement: true,
   },
-  name: Sequelize.STRING(100)
+  name: Sequelize.STRING,
 });
 
-var User = sequelize.define('user', {
+const User = sequelize.define('user', {
   id: {
     type: Sequelize.INTEGER.UNSIGNED,
     primaryKey: true,
-    autoIncrement: true
+    autoIncrement: true,
   },
-  name: Sequelize.STRING(100)
+  name: Sequelize.STRING,
 });
 
-describe("open-rest-helper-getter", function() {
-  describe("Helper init", function() {
-    it("First argument type error", function(done) {
-      assert.throws(function() {
+describe('open-rest-helper-getter', () => {
+  describe('Helper init', () => {
+    it('First argument type error', (done) => {
+      assert.throws(() => {
         getter({});
-      }, function(err) {
-        return err instanceof Error && err.message === 'Model must be a class of Sequelize defined'
-      });
+      }, (err) => (
+        err instanceof Error && err.message === 'Model must be a class of Sequelize defined'
+      ));
       done();
     });
 
 
-    it("Second argument must be string", function(done) {
-      assert.throws(function() {
+    it('Second argument must be string', (done) => {
+      assert.throws(() => {
         getter(Model);
-      }, function(err) {
-        return err instanceof Error && err.message === 'Geted instance will hook on req.hooks[hook], so `hook` must be a string'
+      }, (err) => {
+        const msg = 'Geted instance will hook on req.hooks[hook], so `hook` must be a string';
+        return err instanceof Error && err.message === msg;
       });
       done();
     });
 
-    it("Third argument must be string", function(done) {
-      assert.throws(function() {
+    it('Third argument must be string', (done) => {
+      assert.throws(() => {
         getter(Model, 'book', []);
-      }, function(err) {
-        return err instanceof Error && err.message === 'Gets the value at path of object.'
-      });
+      }, (err) => err instanceof Error && err.message === 'Gets the value at path of object.');
       done();
     });
 
-    it("All arguments right no exception", function(done) {
-      var helper = getter(Model, 'book');
-      var req = {
+    it('All arguments right no exception', (done) => {
+      const helper = getter(Model, 'book');
+      const req = {
         hooks: {},
-        params: {id: 20}
+        params: { id: 20 },
       };
-      var res = {};
-      var book = {id: 20, name: 'JavaScript 高级程序设计'};
+      const res = {};
+      const book = { id: 20, name: 'JavaScript 高级程序设计' };
 
-      Model.find = function(opts) {
-        assert.deepEqual({where: {id: 20}}, opts);
-        return new Promise(function(resolve, reject) {
+      Model.find = (opts) => {
+        assert.deepEqual({ where: { id: 20 } }, opts);
+        return new Promise((resolve) => {
           resolve(book);
         });
       };
 
-      helper(req, res, function(err) {
+      helper(req, res, (err) => {
         assert.equal(null, err);
-        assert.equal(req.hooks['book'], book);
+        assert.equal(req.hooks.book, book);
         done();
       });
     });
 
-    it("All arguments right no exception id = req.hooks[obj][id]", function(done) {
-      var helper = getter(Model, 'book', 'hooks.user.bookId');
-      var req = {
+    it('All arguments right no exception id = req.hooks[obj][id]', (done) => {
+      const helper = getter(Model, 'book', 'hooks.user.bookId');
+      const req = {
         hooks: {
-          user: {bookId: 30}
+          user: { bookId: 30 },
         },
-        params: {id: 20}
+        params: { id: 20 },
       };
-      var res = {};
-      var book = {id: 20, name: 'JavaScript 高级程序设计'};
+      const res = {};
+      const book = { id: 20, name: 'JavaScript 高级程序设计' };
 
-      Model.find = function(opts) {
-        assert.deepEqual({where: {id: 30}}, opts);
-        return new Promise(function(resolve, reject) {
+      Model.find = (opts) => {
+        assert.deepEqual({ where: { id: 30 } }, opts);
+        return new Promise((resolve) => {
           resolve(book);
         });
       };
 
-      helper(req, res, function(err) {
+      helper(req, res, (err) => {
         assert.equal(null, err);
-        assert.equal(req.hooks['book'], book);
+        assert.equal(req.hooks.book, book);
         done();
       });
     });
 
 
-    it("All arguments right has exception", function(done) {
-      var helper = getter(Model, 'book');
-      var req = {
+    it('All arguments right has exception', (done) => {
+      const helper = getter(Model, 'book');
+      const req = {
         hooks: {},
-        params: {id: 20}
+        params: { id: 20 },
       };
-      var res = {};
-      var error = Error('Find book error');
+      const res = {};
+      const error = Error('Find book error');
 
-      Model.find = function(opts) {
-        assert.deepEqual({where: {id: 20}}, opts);
-        return new Promise(function(resolve, reject) {
+      Model.find = (opts) => {
+        assert.deepEqual({ where: { id: 20 } }, opts);
+        return new Promise((resolve, reject) => {
           reject(error);
         });
       };
 
-      helper(req, res, function(err) {
+      helper(req, res, (err) => {
         assert.equal(error, err);
-        assert.equal(req.hooks['book'], undefined);
+        assert.equal(req.hooks.book, undefined);
         done();
       });
     });
 
-    it("All arguments right includes", function(done) {
+    it('All arguments right includes', (done) => {
       Model.includes = {
         user: {
           model: User,
           as: 'creator',
-          required: true
-        }
+          required: true,
+        },
       };
 
-      var helper = getter(Model, 'book');
-      var req = {
+      const helper = getter(Model, 'book');
+      const req = {
         hooks: {},
-        params: {id: 20, includes: 'user'}
+        params: { id: 20, includes: 'user' },
       };
-      var res = {};
-      var error = Error('Find book error');
+      const res = {};
+      const error = Error('Find book error');
 
-      Model.find = function(opts) {
-        assert.deepEqual({where: {id: 20}, include: [{
-          model: User,
-          as: 'creator',
-          required: true
-        }]}, opts);
-        return new Promise(function(resolve, reject) {
+      Model.find = (opts) => {
+        assert.deepEqual({
+          where: { id: 20 },
+          include: [{
+            model: User,
+            as: 'creator',
+            required: true,
+          }],
+        }, opts);
+        return new Promise((resolve, reject) => {
           reject(error);
         });
       };
 
-      helper(req, res, function(err) {
+      helper(req, res, (err) => {
         assert.equal(error, err);
-        assert.equal(req.hooks['book'], undefined);
+        assert.equal(req.hooks.book, undefined);
         done();
       });
     });
 
-    it("All arguments none includes", function(done) {
+    it('All arguments none includes', (done) => {
       Model.includes = undefined;
-      var helper = getter(Model, 'book');
-      var req = {
+      const helper = getter(Model, 'book');
+      const req = {
         hooks: {},
-        params: {id: 20, includes: 'user'}
+        params: { id: 20, includes: 'user' },
       };
-      var res = {};
-      var error = Error('Find book error');
+      const res = {};
+      const error = Error('Find book error');
 
-      Model.find = function(opts) {
-        assert.deepEqual({where: {id: 20}}, opts);
-        return new Promise(function(resolve, reject) {
+      Model.find = (opts) => {
+        assert.deepEqual({ where: { id: 20 } }, opts);
+        return new Promise((resolve, reject) => {
           reject(error);
         });
       };
 
-      helper(req, res, function(err) {
+      helper(req, res, (err) => {
         assert.equal(error, err);
-        assert.equal(req.hooks['book'], undefined);
+        assert.equal(req.hooks.book, undefined);
         done();
       });
     });
 
-    it("All arguments params includes isnt string", function(done) {
+    it('All arguments params includes isnt string', (done) => {
       Model.includes = {
         user: {
           model: User,
           as: 'creator',
-          required: true
-        }
+          required: true,
+        },
       };
 
-      var helper = getter(Model, 'book');
-      var req = {
+      const helper = getter(Model, 'book');
+      const req = {
         hooks: {},
-        params: {id: 20, includes: ['user']}
+        params: { id: 20, includes: ['user'] },
       };
-      var res = {};
-      var error = Error('Find book error');
+      const res = {};
+      const error = Error('Find book error');
 
-      Model.find = function(opts) {
-        assert.deepEqual({where: {id: 20}}, opts);
-        return new Promise(function(resolve, reject) {
+      Model.find = (opts) => {
+        assert.deepEqual({ where: { id: 20 } }, opts);
+        return new Promise((resolve, reject) => {
           reject(error);
         });
       };
 
-      helper(req, res, function(err) {
+      helper(req, res, (err) => {
         assert.equal(error, err);
-        assert.equal(req.hooks['book'], undefined);
+        assert.equal(req.hooks.book, undefined);
         done();
       });
     });
 
-    it("All arguments params includes dont match", function(done) {
+    it('All arguments params includes dont match', (done) => {
       Model.includes = {
         user: {
           model: User,
           as: 'creator',
-          required: true
-        }
+          required: true,
+        },
       };
 
-      var helper = getter(Model, 'book');
-      var req = {
+      const helper = getter(Model, 'book');
+      const req = {
         hooks: {},
-        params: {id: 20, includes: 'author'}
+        params: { id: 20, includes: 'author' },
       };
-      var res = {};
-      var error = Error('Find book error');
+      const res = {};
+      const error = Error('Find book error');
 
-      Model.find = function(opts) {
-        assert.deepEqual({where: {id: 20}}, opts);
-        return new Promise(function(resolve, reject) {
+      Model.find = (opts) => {
+        assert.deepEqual({ where: { id: 20 } }, opts);
+        return new Promise((resolve, reject) => {
           reject(error);
         });
       };
 
-      helper(req, res, function(err) {
+      helper(req, res, (err) => {
         assert.equal(error, err);
-        assert.equal(req.hooks['book'], undefined);
+        assert.equal(req.hooks.book, undefined);
         done();
       });
     });
